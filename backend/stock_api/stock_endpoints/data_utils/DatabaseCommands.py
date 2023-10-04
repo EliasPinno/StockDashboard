@@ -15,7 +15,6 @@ class Database:
         Returns a database connection if one exists, or creates a new one
         if it does not already exist.
         """
-        #global conn
         if not self.conn: # We need to create connection
             self.conn = sqlite3.connect(self.DB_FILENAME)
         return self.conn
@@ -61,11 +60,14 @@ class Database:
         """
         conn = self.getConnection()
         cursor = conn.cursor()
-        select_query = "SELECT * FROM {} WHERE ticker=?".format(self.STOCK_TABLE_NAME)
+        select_query = "SELECT date, price FROM {} WHERE ticker=? ORDER BY date DESC".format(self.STOCK_TABLE_NAME)
         cursor.execute(select_query, (ticker,))
         result = cursor.fetchall()
         cursor.close()
-        return result
+        resultMap = {"ticker": ticker, "prices": {}}
+        for row in result:
+            resultMap["prices"][row[0]] = row[1]
+        return resultMap
     
     def insertData(self, data: List[Tuple[str,str,float]]):
         """
@@ -82,7 +84,8 @@ class Database:
     def getMostRecentDateForTickers(self, tickers: List[str]):
         conn = self.getConnection()
         cursor = conn.cursor()
-        select_query = "SELECT ticker, MAX(date) AS max_date FROM {} WHERE ticker = ({}) GROUP BY ticker".format(self.STOCK_TABLE_NAME,','.join(['?'] * len(tickers)))
+        select_query = "SELECT ticker, MAX(date) AS max_date FROM {} WHERE ticker IN ({}) GROUP BY ticker".format(self.STOCK_TABLE_NAME,','.join(['?'] * len(tickers)))
+        print(select_query)
         cursor.execute(select_query, tickers)
         result = cursor.fetchall()
         cursor.close()
@@ -94,7 +97,7 @@ class Database:
     def getDataInDateRange(self, tickers: List[str], aboveDate, belowDate):
         conn = self.getConnection()
         cursor = conn.cursor()
-        select_query = "SELECT ticker, date, price FROM {} WHERE ticker IN ({}) AND date >= ? AND date <= ? ORDER BY ticker, date".format(self.STOCK_TABLE_NAME, ','.join(['?'] * len(tickers)))
+        select_query = "SELECT ticker, date, price FROM {} WHERE ticker IN ({}) AND date >= ? AND date <= ? ORDER BY ticker, date DESC".format(self.STOCK_TABLE_NAME, ','.join(['?'] * len(tickers)))
         cursor.execute(select_query, tickers + [aboveDate, belowDate])
         result = cursor.fetchall()
         cursor.close()
@@ -103,18 +106,15 @@ class Database:
             resultList.append({"ticker":ticker, "date":date, "price":price})
         return resultList
 
-DBInstance = None
 def getDBInstance() -> Database:
-    global DBInstance
     """
-    Creates a singleton Database object if it does not exist. Returns a database object.
+    Creates a Database object if it does not exist. Returns a database object.
     Must run 'source .env' and have these environment variables set for the method to work
     """
-    if not DBInstance:
-        DB_FILENAME = os.environ.get("DB_FILENAME")
-        STOCK_TABLE_NAME = os.environ.get("STOCK_TABLE_NAME")
-        DBInstance = Database(DB_FILENAME, STOCK_TABLE_NAME)
-    return DBInstance
+    DB_FILENAME = os.environ.get("DB_FILENAME")
+    STOCK_TABLE_NAME = os.environ.get("STOCK_TABLE_NAME")
+        
+    return Database(DB_FILENAME, STOCK_TABLE_NAME)
 
 if __name__ == "__main__":
     db = getDBInstance()
