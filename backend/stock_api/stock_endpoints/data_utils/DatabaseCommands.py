@@ -87,10 +87,21 @@ class Database:
         result = cursor.fetchall()
         cursor.close()
         resultMap = {}
-        # Row[0] = ticker. max_date = row[1]
         for row in result:
             resultMap[row[0]] = row[1]
         return resultMap
+    
+    def getDataInDateRange(self, tickers: List[str], aboveDate, belowDate):
+        conn = self.getConnection()
+        cursor = conn.cursor()
+        select_query = "SELECT ticker, date, price FROM {} WHERE ticker IN ({}) AND date >= ? AND date <= ? ORDER BY ticker, date".format(self.STOCK_TABLE_NAME, ','.join(['?'] * len(tickers)))
+        cursor.execute(select_query, tickers + [aboveDate, belowDate])
+        result = cursor.fetchall()
+        cursor.close()
+        resultList = []
+        for ticker, date, price in result:
+            resultList.append({"ticker":ticker, "date":date, "price":price})
+        return resultList
 
 DBInstance = None
 def getDBInstance() -> Database:
