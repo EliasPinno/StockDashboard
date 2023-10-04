@@ -75,10 +75,19 @@ class Database:
         """
         conn = self.getConnection()
         insert_query = 'INSERT INTO {} (ticker, date, price) VALUES (?,?,?)'.format(self.STOCK_TABLE_NAME)
-        cursor = self.conn.cursor()
+        cursor = conn.cursor()
         cursor.executemany(insert_query, data)
-        self.conn.commit()
+        conn.commit()
         cursor.close()
+
+    def getMostRecentDateForTickers(self, tickers: List[str]):
+        conn = self.getConnection()
+        cursor = conn.cursor()
+        select_query = "SELECT MAX(date) AS max_date FROM {} WHERE ticker = ({}) GROUP BY ticker".format(self.STOCK_TABLE_NAME,','.join(['?'] * len(tickers)))
+        cursor.execute(select_query, tickers)
+        result = cursor.fetchall()
+        cursor.close()
+        return result
 
 DBInstance = None
 def getDBInstance() -> Database:
