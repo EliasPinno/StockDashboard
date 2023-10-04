@@ -11,7 +11,7 @@ class AlphaVantageAPI:
         url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&apikey={}'.format(ticker,self.apiKey)
         r = requests.get(url)
         data = r.json()
-        print(data["Time Series (Daily)"]["2023-10-03"])
+        return data
 
 APIInstance = None
 def getAlphaVantageAPIInstance() -> AlphaVantageAPI:
