@@ -4,7 +4,7 @@ import os
 
 class AlphaVantageAPI:
 
-    def __init__(apiKey):
+    def __init__(self, apiKey):
         self.apiKey = apiKey
 
     def getTickerData(self,ticker):
