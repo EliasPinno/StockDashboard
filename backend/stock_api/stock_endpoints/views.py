@@ -52,4 +52,16 @@ def getDataForDateRange(request):
     """
     Returns all of the data for the given tickers for the given date range.
     """
-    return Response({"diff": "ticker"})
+    try:
+        request_data = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return Response({"error": "Invalid JSON data"}, status=400)
+    """
+    Returns all of the data for the given tickers for the given day.
+    """
+    tickers = request_data.get("tickers", [])
+    aboveDate = request_data.get("aboveDate", "")
+    belowDate = request_data.get("belowDate", "")
+    db = getDBInstance()
+    result = db.getDataInDateRange(tickers,aboveDate,belowDate)
+    return Response(result)
