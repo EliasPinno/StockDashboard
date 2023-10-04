@@ -8,14 +8,14 @@ class Database:
     conn: None | sqlite3.Connection = None
 
     @staticmethod
-    def getConnection() -> sqlite3.Connection:
+    def getConnection(connectionSrc = DB_FILENAME) -> sqlite3.Connection:
         """
         This method returns a database connection if one exists, or creates a new one
         if it does not already exist.
         """
         global conn
         if not conn: # We need to create connection
-            conn = sqlite3.connect(Database.DB_FILENAME)
+            conn = sqlite3.connect(connectionSrc)
         return conn
 
     @staticmethod
