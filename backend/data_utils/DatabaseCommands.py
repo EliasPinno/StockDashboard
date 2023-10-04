@@ -4,37 +4,35 @@ from sqlite3 import Error
 class Database:
     DB_FILENAME = "PROJECT_DB"
     STOCK_TABLE_NAME = "stock_prices"
-    #IS_STORED_TABLE_NAME = "is_stored"
     conn: None | sqlite3.Connection = None
 
-    @staticmethod
-    def getConnection(connectionSrc = DB_FILENAME) -> sqlite3.Connection:
+    @classmethod
+    def getConnection(cls, connectionSrc = DB_FILENAME) -> sqlite3.Connection:
         """
         This method returns a database connection if one exists, or creates a new one
         if it does not already exist.
         """
-        global conn
-        if not conn: # We need to create connection
-            conn = sqlite3.connect(connectionSrc)
-        return conn
+        #global conn
+        if not cls.conn: # We need to create connection
+            cls.conn = sqlite3.connect(connectionSrc)
+        return cls.conn
 
-    @staticmethod
-    def closeConnection() -> None:
+    @classmethod
+    def closeConnection(cls) -> None:
         """
         This method closes an existing database connection, setting the singleton to none.
         This method does nothing if a connection does not exist.
         """
-        global conn
-        if conn: # connection exists, we need to close it
-            conn.close()
+        if cls.conn: # connection exists, we need to close it
+            cls.conn.close()
 
-    @staticmethod
-    def createDatabase():
+    @classmethod
+    def createDatabase(cls):
         """
         This function creates the table(s) for the database if they do not already exist.
         """
-        conn = Database.getConnection()
-        cursor = conn.cursor()
+        cls.conn = Database.getConnection()
+        cursor = cls.conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS {} (
             ticker TEXT CHECK(length(ticker) <= 5),
@@ -46,13 +44,13 @@ class Database:
         # TODO: Think about putting in an is_stored table
         cursor.close()
 
-    @staticmethod
-    def dropTable():
+    @classmethod
+    def dropTable(cls):
         """
         This function drops the table, wiping out the local cache if it exists
         """
-        conn = Database.getConnection()
-        cursor = conn.cursor()
+        cls.conn = Database.getConnection()
+        cursor = cls.conn.cursor()
         cursor.execute("DROP TABLE {}".format(Database.STOCK_TABLE_NAME))
         print("Dropped table {}".format(Database.STOCK_TABLE_NAME))
         cursor.close()
