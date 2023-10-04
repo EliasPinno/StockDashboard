@@ -8,7 +8,28 @@ def getAllDataForTicker(request, ticker: str):
     """
     Returns a response with all of the data stored for a given ticker.
     """
-    return Response({"ticker": ticker})
+    if len(ticker) > 5:
+        return Response({"result":"error"})
+    db = getDBInstance()
+    #db.dropTable()
+    #db.createDatabase()
+    cachedTicker = db.getMostRecentDateForTickers([ticker])
+    api = getAlphaVantageAPIInstance()
+    apiResponse = api.getTickerData(ticker)
+    if ticker not in cachedTicker:
+        print("Ticker not in db: cache from scratch.")
+        dataToCache = apiResponse["Time Series (Daily)"]
+        dbFormOfData = []
+        for date in dataToCache.keys():
+            print(date)
+            dbFormOfData.append((ticker, date, dataToCache[date]["4. close"]))
+        print(dbFormOfData)
+        db.insertData(dbFormOfData)
+    elif cachedTicker[ticker] != apiResponse["Meta Data"]["3. Last Refreshed"]:
+        print("Ticker in db but not updated: compute diff")
+        pass
+    print("Data is now cached, returning cache.")
+    return Response({"result":db.getAllDataForTicker(ticker)})
 
 @api_view(["POST"])
 def getDataForSingleDay(request):
