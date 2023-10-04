@@ -7,6 +7,7 @@ class AlphaVantageAPI:
     def __init__(self, apiKey):
         self.apiKey = apiKey
 
+    #TODO: Add exception handling for bad request responses
     def getTickerData(self,ticker: str):
         url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&apikey={}'.format(ticker,self.apiKey)
         r = requests.get(url)
