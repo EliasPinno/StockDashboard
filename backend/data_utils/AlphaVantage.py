@@ -4,13 +4,12 @@ import os
 
 class AlphaVantageAPI:
 
-    @classmethod
+    @staticmethod
     def getTickerData(ticker,apiKey):
-        print(cls.apiKey)
-        url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&apikey={}'.format(ticker,cls.apiKey)
+        url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&apikey={}'.format(ticker,apiKey)
         r = requests.get(url)
         data = r.json()
-        print(data)
+        print(data["Time Series (Daily)"]["2023-10-03"])
 
 
 def main(*args):
@@ -18,7 +17,6 @@ def main(*args):
     # source .env
     apiKey = os.environ.get("API_KEY","demo")
     AlphaVantageAPI.getTickerData("IBM",apiKey)
-    pass
 
 if __name__ == "__main__":
     main(*sys.argv)
