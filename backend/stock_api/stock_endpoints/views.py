@@ -1,5 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .data_utils.AlphaVantage import getAlphaVantageAPIInstance
+from .data_utils.DatabaseCommands import getDBInstance
 
 @api_view(["GET"])
 def getAllDataForTicker(request, ticker: str):
