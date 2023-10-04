@@ -21,10 +21,3 @@ def getAlphaVantageAPIInstance() -> AlphaVantageAPI:
     """
     return AlphaVantageAPI(os.environ.get("API_KEY","demo"))
 
-def main(*args):
-    avApi = getAlphaVantageAPIInstance()
-    avApi.getTickerData("IBM")
-
-if __name__ == "__main__":
-    main(*sys.argv)
-
