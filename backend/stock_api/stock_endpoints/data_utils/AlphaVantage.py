@@ -13,16 +13,12 @@ class AlphaVantageAPI:
         data = r.json()
         return data
 
-APIInstance = None
 def getAlphaVantageAPIInstance() -> AlphaVantageAPI:
-    global APIInstance
     """
-    Creates a singleton AlphaVantageAPI object if it does not exist. Returns a AlphaVantageAPI object.
+    Creates an AlphaVantageAPI object if it does not exist. Returns a AlphaVantageAPI object.
     Must run 'source .env' and have these environment variables for the method to work.
     """
-    if not APIInstance:
-        APIInstance = AlphaVantageAPI(os.environ.get("API_KEY","demo"))
-    return APIInstance
+    return AlphaVantageAPI(os.environ.get("API_KEY","demo"))
 
 def main(*args):
     avApi = getAlphaVantageAPIInstance()
