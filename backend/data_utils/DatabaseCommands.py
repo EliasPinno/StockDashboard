@@ -1,9 +1,11 @@
 import sqlite3
 from sqlite3 import Error
+import os
 
+DB_FILENAME = os.environ.get("DB_FILENAME")
+STOCK_TABLE_NAME = os.environ.get("STOCK_TABLE_NAME")
 class Database:
-    DB_FILENAME = "PROJECT_DB"
-    STOCK_TABLE_NAME = "stock_prices"
+
     conn: None | sqlite3.Connection = None
 
     @classmethod
