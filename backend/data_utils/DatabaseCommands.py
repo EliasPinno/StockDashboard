@@ -56,3 +56,11 @@ class Database:
         cursor.execute("DROP TABLE {}".format(Database.STOCK_TABLE_NAME))
         print("Dropped table {}".format(Database.STOCK_TABLE_NAME))
         cursor.close()
+
+"""
+DATABASE = None
+def DB():
+    if not DATABASE:
+        return 
+    pass
+"""
