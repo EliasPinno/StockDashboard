@@ -14,7 +14,7 @@ class DatabaseTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.db = Database("test_db", "test_table")
+        cls.db = Database("test_DB", "test_table")
 
     @classmethod
     def tearDownClass(cls):
