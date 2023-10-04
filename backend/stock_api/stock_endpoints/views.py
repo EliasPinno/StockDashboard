@@ -1,3 +1,4 @@
+import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .data_utils.AlphaVantage import getAlphaVantageAPIInstance
@@ -33,10 +34,18 @@ def getAllDataForTicker(request, ticker: str):
 
 @api_view(["POST"])
 def getDataForSingleDay(request):
+    try:
+        request_data = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return Response({"error": "Invalid JSON data"}, status=400)
     """
     Returns all of the data for the given tickers for the given day.
     """
-    return Response(request)
+    tickers = request_data.get("tickers", [])
+    date = request_data.get("date", "")
+    db = getDBInstance()
+    result = db.getDataInDateRange(tickers,date,date)
+    return Response(result)
 
 @api_view(["POST"])
 def getDataForDateRange(request):
