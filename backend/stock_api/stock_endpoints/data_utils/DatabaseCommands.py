@@ -37,12 +37,11 @@ class Database:
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS {} (
-            ticker TEXT CHECK(length(ticker) <= 5),
-            date DATE,
-            price FLOAT
-            PRIMARY KEY (ticker, date)
-        )
-        '''.format(self.STOCK_TABLE_NAME))
+                       ticker TEXT CHECK(length(ticker) <= 5),
+                       date DATE,
+                       price FLOAT, 
+                       PRIMARY KEY (ticker, date))
+                       '''.format(self.STOCK_TABLE_NAME))
         # TODO: Think about putting in an is_stored table
         cursor.close()
 
@@ -83,14 +82,19 @@ class Database:
     def getMostRecentDateForTickers(self, tickers: List[str]):
         conn = self.getConnection()
         cursor = conn.cursor()
-        select_query = "SELECT MAX(date) AS max_date FROM {} WHERE ticker = ({}) GROUP BY ticker".format(self.STOCK_TABLE_NAME,','.join(['?'] * len(tickers)))
+        select_query = "SELECT ticker, MAX(date) AS max_date FROM {} WHERE ticker = ({}) GROUP BY ticker".format(self.STOCK_TABLE_NAME,','.join(['?'] * len(tickers)))
         cursor.execute(select_query, tickers)
         result = cursor.fetchall()
         cursor.close()
-        return result
+        resultMap = {}
+        # Row[0] = ticker. max_date = row[1]
+        for row in result:
+            resultMap[row[0]] = row[1]
+        return resultMap
 
 DBInstance = None
 def getDBInstance() -> Database:
+    global DBInstance
     """
     Creates a singleton Database object if it does not exist. Returns a database object.
     Must run 'source .env' and have these environment variables set for the method to work
@@ -100,3 +104,10 @@ def getDBInstance() -> Database:
         STOCK_TABLE_NAME = os.environ.get("STOCK_TABLE_NAME")
         DBInstance = Database(DB_FILENAME, STOCK_TABLE_NAME)
     return DBInstance
+
+if __name__ == "__main__":
+    db = getDBInstance()
+    db.createDatabase()
+    db.getMostRecentDateForTickers(["IBM"])
+
+
