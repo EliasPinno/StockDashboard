@@ -2,11 +2,12 @@ from django.urls import path
 
 from .views import (
     getAllDataForTicker,
-    getDataForDateRange
+    getDataForDateRange,
+    getDataForSingleDay
 )
 
 urlpatterns = [
     path("getAllData/<str:ticker>", getAllDataForTicker),
-    path("getDataForSingleDay", getAllDataForTicker),
+    path("getDataForSingleDay", getDataForSingleDay),
     path("getDataForDateRange", getDataForDateRange),
 ]
