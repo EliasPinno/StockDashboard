@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     getAllDataForTicker,
     getDataForDateRange,
-    getDataForSingleDay
+    getDataForSingleDay,
 )
 
 urlpatterns = [
